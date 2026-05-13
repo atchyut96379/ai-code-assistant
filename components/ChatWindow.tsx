@@ -55,13 +55,15 @@ export default function ChatWindow({
   }, [messages]);
 
   // Reset chat
-useEffect(() => {
-  if (resetTrigger === 0) return;
+  useEffect(() => {
+    if (resetTrigger === 0) return;
 
-  setMessages([]);
+    setMessages([]);
 
-  localStorage.removeItem(STORAGE_KEY);
-}, [resetTrigger]);
+    localStorage.removeItem(
+      STORAGE_KEY
+    );
+  }, [resetTrigger]);
 
   const sendMessage = async (
     prompt: string
@@ -89,40 +91,39 @@ useEffect(() => {
             "Content-Type":
               "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({
             messages: updatedMessages,
           }),
         }
       );
 
-if (!response.body) return;
+      const data =
+        await response.json();
 
-const reader =
-  response.body.getReader();
+      const assistantMessage: Message =
+        {
+          role: "assistant",
+          content:
+            data.content ||
+            "No response",
+        };
 
-let assistantText = "";
-
-while (true) {
-  const { done, value } =
-    await reader.read();
-
-  if (done) break;
-
-  const chunk =
-    new TextDecoder().decode(value);
-
-  assistantText += chunk;
-
-  setMessages([
-    ...updatedMessages,
-    {
-      role: "assistant",
-      content: assistantText,
-    },
-  ]);
-}
+      setMessages([
+        ...updatedMessages,
+        assistantMessage,
+      ]);
     } catch (error) {
       console.error(error);
+
+      setMessages([
+        ...updatedMessages,
+        {
+          role: "assistant",
+          content:
+            "Something went wrong.",
+        },
+      ]);
     } finally {
       setLoading(false);
     }
