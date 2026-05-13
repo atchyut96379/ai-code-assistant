@@ -16,58 +16,81 @@ export default function MessageBubble({
 }: Props) {
   return (
     <div
-      className={`flex w-full ${
+      className={`flex w-full overflow-hidden ${
         role === "user"
           ? "justify-end"
           : "justify-start"
       }`}
     >
       <div
-        className={`max-w-4xl whitespace-pre-wrap rounded-2xl px-5 py-4 ${
-          role === "user"
-            ? "bg-blue-600 text-white"
-            : "bg-zinc-900 text-zinc-100"
-        }`}
+        className={`
+          w-full
+          max-w-full
+          overflow-hidden
+          break-words
+          rounded-2xl
+          px-4
+          py-4
+          sm:px-5
+          ${
+            role === "user"
+              ? "bg-blue-600 text-white"
+              : "bg-zinc-900 text-zinc-100"
+          }
+        `}
       >
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          components={{
-            code(props) {
-              const {
-                children,
-                className,
-              } = props;
+        <div className="overflow-hidden break-words">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              code(props) {
+                const {
+                  children,
+                  className,
+                } = props;
 
-              const match = /language-(\w+)/.exec(
-                className || ""
-              );
+                const match =
+                  /language-(\w+)/.exec(
+                    className || ""
+                  );
 
-              const language =
-                match?.[1] || "text";
+                const language =
+                  match?.[1] || "text";
 
-              const value = String(
-                children
-              ).replace(/\n$/, "");
+                const value = String(
+                  children
+                ).replace(/\n$/, "");
 
-              if (match) {
+                if (match) {
+                  return (
+                    <div className="max-w-full overflow-x-auto">
+                      <CodeBlock
+                        language={language}
+                        value={value}
+                      />
+                    </div>
+                  );
+                }
+
                 return (
-                  <CodeBlock
-                    language={language}
-                    value={value}
-                  />
+                  <code
+                    className="
+                      break-all
+                      rounded
+                      bg-zinc-800
+                      px-1
+                      py-0.5
+                    "
+                  >
+                    {children}
+                  </code>
                 );
-              }
-
-              return (
-                <code className="rounded bg-zinc-800 px-1 py-0.5">
-                  {children}
-                </code>
-              );
-            },
-          }}
-        >
-          {content}
-        </ReactMarkdown>
+              },
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
       </div>
     </div>
   );
