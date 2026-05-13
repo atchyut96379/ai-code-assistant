@@ -1,4 +1,4 @@
-import { groq } from "@/lib/groq";
+import { getGroqClient } from "@/lib/groq";
 import { auth } from "@clerk/nextjs/server";
 
 import {
@@ -52,8 +52,10 @@ export async function POST(req: Request) {
     );
 
     // AI Completion
+    const groq = getGroqClient();
+
     const completion =
-      await groq.chat.completions.create({
+    await groq.chat.completions.create({
         model:
           "llama-3.3-70b-versatile",
         messages,
