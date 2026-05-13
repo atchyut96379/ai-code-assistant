@@ -1,21 +1,25 @@
 "use server";
 
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 
 export async function createConversation(
   userId: string,
   title: string
 ) {
-  const { data, error } = await supabase
-    .from("conversations")
-    .insert([
-      {
-        user_id: userId,
-        title,
-      },
-    ])
-    .select()
-    .single();
+  const supabase =
+    getSupabaseClient();
+
+  const { data, error } =
+    await supabase
+      .from("conversations")
+      .insert([
+        {
+          user_id: userId,
+          title,
+        },
+      ])
+      .select()
+      .single();
 
   if (error) {
     console.error(error);
@@ -30,15 +34,20 @@ export async function saveMessage(
   role: string,
   content: string
 ) {
-  const { error } = await supabase
-    .from("messages")
-    .insert([
-      {
-        conversation_id: conversationId,
-        role,
-        content,
-      },
-    ]);
+  const supabase =
+    getSupabaseClient();
+
+  const { error } =
+    await supabase
+      .from("messages")
+      .insert([
+        {
+          conversation_id:
+            conversationId,
+          role,
+          content,
+        },
+      ]);
 
   if (error) {
     console.error(error);
